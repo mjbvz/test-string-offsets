@@ -2,7 +2,7 @@ const wasm = require('./pkg/string_offsets_js.js');
 
 class StringOffsets {
   constructor(content) {
-    this.inner = wasm.WasmStringOffsets.from_bytes(new TextEncoder().encode(content));
+    this.inner = wasm.from_bytes(new TextEncoder().encode(content));
   }
 
   lines() {

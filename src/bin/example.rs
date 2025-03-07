@@ -1,4 +1,4 @@
-use string_offsets::StringOffsets;
+use string_offsets_js::StringOffsets;
 
 fn main() {
     // Example with Unicode text, similar to the JS example

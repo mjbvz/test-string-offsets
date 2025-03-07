@@ -51,16 +51,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eded382c5f5f786b989652c49544c4877d9f015cc22e145a5ea8ea66c2921cd2"
 
 [[package]]
-name = "string-offsets"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b29d69667ff8ba10f976b0c29a53252d7cec1b1e2f5174bddaaf40b69f6af633"
-
-[[package]]
 name = "string-offsets-js"
 version = "0.1.0"
 dependencies = [
- "string-offsets",
  "wasm-bindgen",
 ]
 
