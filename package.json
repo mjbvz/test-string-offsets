@@ -1,0 +1,23 @@
+{
+  "name": "string-offsets",
+  "version": "0.1.0",
+  "description": "String offset conversions between UTF-8, UTF-16, and lines",
+  "main": "index.js",
+  "scripts": {
+    "build": "wasm-pack build --target nodejs",
+    "test": "jest"
+  },
+  "keywords": [
+    "string",
+    "utf8",
+    "utf16",
+    "wasm",
+    "rust"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "wasm-pack": "^0.13.1"
+  }
+}
