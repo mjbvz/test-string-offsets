@@ -30,6 +30,8 @@ mod bitrank;
 
 use bitrank::{BitRank, BitRankBuilder};
 
+use wasm_bindgen::prelude::*;
+
 /// Converts positions within a given string between UTF-8 byte offsets (the usual in Rust), UTF-16
 /// code units, Unicode code points, and line numbers.
 ///
@@ -84,6 +86,7 @@ use bitrank::{BitRank, BitRankBuilder};
 /// Most operations run in O(1) time. A few require O(log n) time. The memory consumed by this
 /// data structure is typically less than the memory occupied by the actual content. In the best
 /// case, it requires ~45% of the content space.
+#[wasm_bindgen]
 pub struct StringOffsets {
     /// Vector storing, for every line, the byte position at which the line starts.
     line_begins: Vec<u32>,
@@ -105,6 +108,7 @@ pub struct StringOffsets {
 }
 
 /// A position in a string, specified by line and column number.
+#[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Pos {
     /// Zero-indexed line number.
@@ -132,6 +136,7 @@ pub struct Pos {
 // Question: Consider whether we should return an empty line range in this case which would
 // probably be consistent from a mathematical point of view. But then we should also return empty
 // line ranges for empty character ranges in the middle of a line...
+#[wasm_bindgen]
 impl StringOffsets {
     /// Create a new converter to work with offsets into the given string.
     pub fn new(content: &str) -> Self {
@@ -142,15 +147,17 @@ impl StringOffsets {
     ///
     /// If `content` is UTF-8, this is just like [`StringOffsets::new`]. Otherwise, the
     /// conversion methods will produce unspecified (but memory-safe) results.
+    ///  
+    #[wasm_bindgen]
     pub fn from_bytes(content: &[u8]) -> Self {
         new_converter(content)
     }
 
     /// Returns the number of Unicode characters on the specified line.
-    pub fn line_chars(&self, line_number: usize) -> usize {
-        let r = self.utf8s_to_chars(self.line_to_utf8s(line_number));
-        r.end - r.start
-    }
+    // pub fn line_chars(&self, line_number: usize) -> usize {
+    //     let r = self.utf8s_to_chars(self.line_to_utf8s(line_number));
+    //     r.end - r.start
+    // }
 
     /// Returns the number of lines in the string.
     pub fn lines(&self) -> usize {
@@ -205,24 +212,24 @@ impl StringOffsets {
     }
 
     /// UTF-8 offset one past the end of a line (the offset of the start of the next line).
-    pub fn line_to_utf8s(&self, line_number: usize) -> Range<usize> {
-        self.line_to_utf8_begin(line_number)..self.line_to_utf8_end(line_number)
-    }
+    // pub fn line_to_utf8s(&self, line_number: usize) -> Range<usize> {
+    //     self.line_to_utf8_begin(line_number)..self.line_to_utf8_end(line_number)
+    // }
 
     /// UTF-32 offsets for the beginning and end of a line, including the newline if any.
-    pub fn line_to_chars(&self, line_number: usize) -> Range<usize> {
-        self.utf8s_to_chars(self.line_to_utf8s(line_number))
-    }
+    // pub fn line_to_chars(&self, line_number: usize) -> Range<usize> {
+    //     self.utf8s_to_chars(self.line_to_utf8s(line_number))
+    // }
 
     /// UTF-8 offsets for the beginning and end of a range of lines, including the newline if any.
-    pub fn lines_to_utf8s(&self, line_numbers: Range<usize>) -> Range<usize> {
-        self.line_to_utf8_begin(line_numbers.start)..self.line_to_utf8_begin(line_numbers.end)
-    }
+    // pub fn lines_to_utf8s(&self, line_numbers: Range<usize>) -> Range<usize> {
+    //     self.line_to_utf8_begin(line_numbers.start)..self.line_to_utf8_begin(line_numbers.end)
+    // }
 
     /// UTF-32 offsets for the beginning and end of a range of lines, including the newline if any.
-    pub fn lines_to_chars(&self, line_numbers: Range<usize>) -> Range<usize> {
-        self.utf8s_to_chars(self.lines_to_utf8s(line_numbers))
-    }
+    // pub fn lines_to_chars(&self, line_numbers: Range<usize>) -> Range<usize> {
+    //     self.utf8s_to_chars(self.lines_to_utf8s(line_numbers))
+    // }
 
     /// Return the zero-based line number of the line containing the specified UTF-8 offset.
     /// Newline characters count as part of the preceding line.
@@ -260,21 +267,21 @@ impl StringOffsets {
     /// If `bytes` is an empty range at a position within or at the beginning of a line, this
     /// returns a nonempty range containing the line number of that one line. An empty range at or
     /// beyond the end of the string translates to an empty range of line numbers.
-    pub fn utf8s_to_lines(&self, bytes: Range<usize>) -> Range<usize> {
-        // The fiddly parts of this formula are necessary because `bytes.start` rounds down to the
-        // beginning of the line, but `bytes.end` "rounds up" to the end of the line. the final
-        // `+1` is to produce a half-open range.
-        self.utf8_to_line(bytes.start)
-            ..self
-                .lines()
-                .min(self.utf8_to_line(bytes.end.saturating_sub(1).max(bytes.start)) + 1)
-    }
+    // pub fn utf8s_to_lines(&self, bytes: Range<usize>) -> Range<usize> {
+    //     // The fiddly parts of this formula are necessary because `bytes.start` rounds down to the
+    //     // beginning of the line, but `bytes.end` "rounds up" to the end of the line. the final
+    //     // `+1` is to produce a half-open range.
+    //     self.utf8_to_line(bytes.start)
+    //         ..self
+    //             .lines()
+    //             .min(self.utf8_to_line(bytes.end.saturating_sub(1).max(bytes.start)) + 1)
+    // }
 
     /// Returns the range of line numbers containing the substring specified by the UTF-32
     /// range `chars`. Newline characters count as part of the preceding line.
-    pub fn chars_to_lines(&self, chars: Range<usize>) -> Range<usize> {
-        self.utf8s_to_lines(self.chars_to_utf8s(chars))
-    }
+    // pub fn chars_to_lines(&self, chars: Range<usize>) -> Range<usize> {
+    //     self.utf8s_to_lines(self.chars_to_utf8s(chars))
+    // }
 
     /// Converts a UTF-8 offset to a UTF-32 offset.
     pub fn utf8_to_char(&self, byte_number: usize) -> usize {
@@ -319,15 +326,15 @@ impl StringOffsets {
         }
     }
 
-    /// Converts a UTF-8 offset range to a UTF-32 offset range.
-    pub fn utf8s_to_chars(&self, bytes: Range<usize>) -> Range<usize> {
-        self.utf8_to_char(bytes.start)..self.utf8_to_char(bytes.end)
-    }
+    // /// Converts a UTF-8 offset range to a UTF-32 offset range.
+    // pub fn utf8s_to_chars(&self, bytes: Range<usize>) -> Range<usize> {
+    //     self.utf8_to_char(bytes.start)..self.utf8_to_char(bytes.end)
+    // }
 
-    /// Converts a UTF-32 offset range to a UTF-8 offset range.
-    pub fn chars_to_utf8s(&self, chars: Range<usize>) -> Range<usize> {
-        self.char_to_utf8(chars.start)..self.char_to_utf8(chars.end)
-    }
+    // /// Converts a UTF-32 offset range to a UTF-8 offset range.
+    // pub fn chars_to_utf8s(&self, chars: Range<usize>) -> Range<usize> {
+    //     self.char_to_utf8(chars.start)..self.char_to_utf8(chars.end)
+    // }
 }
 
 fn new_converter(content: &[u8]) -> StringOffsets {
